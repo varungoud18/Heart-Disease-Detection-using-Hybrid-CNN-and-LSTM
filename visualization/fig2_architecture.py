@@ -1,12 +1,15 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
+
+# Get project root directory
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.set_xlim(0, 10)
 ax.set_ylim(0, 6)
 ax.axis('off')
 
-# Layer positions (x, y, width, height)
 layers = [
     ("Input\n(300,1)", 1, 4.5, 1.2, 0.6),
     ("Conv1D\n32, k=5", 2.6, 4.5, 1.2, 0.6),
@@ -31,7 +34,6 @@ for (label, x, y, w, h), color in zip(layers, colors):
     ax.add_patch(rect)
     ax.text(x+w/2, y+h/2, label, ha='center', va='center', fontsize=8, fontweight='bold')
 
-# Arrows between layers
 arrows = [(1.6, 4.8, 2.6, 4.8), (3.8, 4.8, 4.2, 4.8), (5.2, 4.8, 5.6, 4.8),
           (6.8, 4.8, 7.2, 4.8), (8.2, 4.8, 8.6, 4.8), (9.8, 4.8, 10.2, 4.8),
           (2.6, 4.5, 2.6, 3.4), (3.8, 3.1, 4.3, 3.1), (5.5, 3.1, 6.0, 3.1),
@@ -43,5 +45,9 @@ for (x1, y1, x2, y2) in arrows:
 
 plt.title("Fig. 2: Hybrid CNN-LSTM architecture for ECG classification", fontsize=11)
 plt.tight_layout()
-plt.savefig("fig2_cnn_lstm_architecture.png", dpi=300, bbox_inches='tight')
+
+plot_path = os.path.join(ROOT_DIR, 'overleaf_images', 'fig2_cnn_lstm_architecture.png')
+os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+print(f"Saved: {plot_path}")
 plt.show()

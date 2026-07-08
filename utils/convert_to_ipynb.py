@@ -1,6 +1,9 @@
 import os
 import json
 
+# Get project root directory
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
 def convert_py_to_ipynb():
     py_files = [
         "phase1_ingestion.py", 
@@ -12,16 +15,14 @@ def convert_py_to_ipynb():
     ]
     
     for py_file in py_files:
-        filepath = os.path.join(r"d:\heart_disease", py_file)
+        filepath = os.path.join(ROOT_DIR, "src", py_file)
         if not os.path.exists(filepath):
-            print(f"Warning: {py_file} not found.")
+            print(f"Warning: {py_file} not found at {filepath}")
             continue
             
         with open(filepath, 'r', encoding='utf-8') as f:
             code_content = f.read()
             
-        # Manually constructing the simple Notebook JSON structure
-        # This removes the need for the user to install any 3rd party nbformat packages!
         notebook = {
             "cells": [
                 {
@@ -66,4 +67,4 @@ def convert_py_to_ipynb():
 if __name__ == '__main__':
     print("=== Converting Python Scripts to Jupyter Notebooks ===")
     convert_py_to_ipynb()
-    print("All done! You can now open these .ipynb files in VSCode or Jupyter Lab.")
+    print("All done! Notebooks are generated in the src/ folder.")

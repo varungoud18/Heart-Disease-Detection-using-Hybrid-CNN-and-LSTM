@@ -1,8 +1,11 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Confusion matrix from paper (absolute counts)
+# Get project root directory
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
 cm = np.array([
     [17650, 112, 48, 10, 0],
     [61, 1880, 6, 3, 0],
@@ -11,7 +14,6 @@ cm = np.array([
     [0, 0, 0, 5, 205]
 ])
 
-# Convert to percentages for normalized view
 cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
 
 classes = ['N', 'S', 'V', 'F', 'Q']
@@ -22,5 +24,9 @@ plt.xlabel("Predicted class", fontsize=12)
 plt.ylabel("True class", fontsize=12)
 plt.title("Fig. 4: Confusion matrix (normalized, test set)", fontsize=12)
 plt.tight_layout()
-plt.savefig("fig4_confusion_matrix.png", dpi=300)
+
+plot_path = os.path.join(ROOT_DIR, 'overleaf_images', 'fig4_confusion_matrix.png')
+os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+plt.savefig(plot_path, dpi=300)
+print(f"Saved: {plot_path}")
 plt.show()

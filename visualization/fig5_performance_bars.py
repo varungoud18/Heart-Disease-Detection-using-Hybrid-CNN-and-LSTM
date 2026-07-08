@@ -1,5 +1,9 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Get project root directory
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 models = ['CNN-only', 'LSTM-only', 'Yildirim (2020)', 'Ours (CNN-LSTM)']
 accuracy = [94.2, 91.8, 99.0, 98.7]
@@ -25,5 +29,9 @@ for rect in rects1 + rects2:
                 xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
 
 plt.tight_layout()
-plt.savefig("fig5_performance_bars.png", dpi=300)
+
+plot_path = os.path.join(ROOT_DIR, 'overleaf_images', 'fig5_performance_bars.png')
+os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+plt.savefig(plot_path, dpi=300)
+print(f"Saved: {plot_path}")
 plt.show()

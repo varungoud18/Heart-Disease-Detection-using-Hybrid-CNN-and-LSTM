@@ -1,12 +1,14 @@
 import os
+import sys
 import wfdb
 import matplotlib.pyplot as plt
 
+# Get project root directory
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
 def main():
-    # Setup paths
-    dataset_path = r'd:\heart_disease\dataset\mit-bih-arrhythmia-database-1.0.0'
+    dataset_path = os.path.join(ROOT_DIR, 'dataset', 'mit-bih-arrhythmia-database-1.0.0')
     
-    # 1. Environment and Path Checks
     print("=== Phase 1: Data Ingestion & Directory Mapping ===")
     if not os.path.exists(dataset_path):
         print(f"Error: Dataset not found at {dataset_path}")
@@ -14,28 +16,24 @@ def main():
         
     print(f"Loading dataset from: {dataset_path}")
     
-    # Get all record names (e.g. '100', '101')
     records = set([f.split('.')[0] for f in os.listdir(dataset_path) if f.endswith('.hea')])
     records = sorted(list(records))
     print(f"Found {len(records)} records in standard PhysioNet format.\n")
     
-    # 2. Extract Data and Annotations (We'll check record 100 for a demonstration)
     record_name = records[0]
     record_path = os.path.join(dataset_path, record_name)
     
     try:
-        # Load the physical signal and annotations
         record = wfdb.rdrecord(record_path)
         annotation = wfdb.rdann(record_path, 'atr')
         
-        sig = record.p_signal[:, 0] # Use MLII (first channel)
+        sig = record.p_signal[:, 0]
         labels = annotation.symbol
         samples = annotation.sample
     except Exception as e:
         print(f"Error loading record {record_name}: {e}")
         return
 
-    # Count samples per class in just this specific file (as a quick peek)
     from collections import Counter
     class_counts = Counter(labels)
     print(f"--- Quick Peek into Record {record_name} ---")
@@ -44,14 +42,11 @@ def main():
     for label, count in class_counts.items():
         print(f"  Type '{label}': {count}")
     
-    # 3. Plotting One Normal vs. One Arrhythmia heartbeat
-    # Usually 'N' is normal. Let's find one 'N' and one non-'N' (e.g. 'V', 'A', etc.)
     normal_idx = None
     arrhythmia_idx = None
     
     for i, symbol in enumerate(labels):
         if symbol == 'N' and normal_idx is None:
-            # ensure it's not too close to the beginning/end
             if samples[i] > 150 and samples[i] < len(sig) - 150:
                 normal_idx = samples[i]
         elif symbol in ['V', 'S', 'A', 'F', 'R', 'L'] and arrhythmia_idx is None:
@@ -69,7 +64,6 @@ def main():
     print(f"\nExtracted one Normal (N) at sample {normal_idx}")
     print(f"Extracted one Arrhythmia ({arrhythmia_type}) at sample {arrhythmia_idx}")
     
-    # Extract windows centered at the peak. 300 samples total
     window = 150 
     
     normal_signal = sig[normal_idx - window : normal_idx + window]
@@ -92,8 +86,13 @@ def main():
     plt.grid(True)
     
     plt.tight_layout()
-    plt.savefig(r'd:\heart_disease\phase1_plot.png')
-    print("\nSaved comparison plot to 'd:\\heart_disease\\phase1_plot.png'.")
+    plot_path = os.path.join(ROOT_DIR, 'overleaf_images', 'phase1_plot.png')
+    
+    # Ensure overleaf_images directory exists
+    os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+    
+    plt.savefig(plot_path)
+    print(f"\nSaved comparison plot to '{plot_path}'.")
     plt.show()
 
 if __name__ == '__main__':

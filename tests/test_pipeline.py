@@ -7,9 +7,9 @@ import tensorflow as tf
 # Ensure root directory is in python path for importing
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from phase2_preprocessing import apply_bandpass_filter, zscore_normalize, aami_mapping, label_to_int
-from phase3_model import build_cnn_lstm_model
-from inference import predict_heartbeat, int_to_label
+from src.phase2_preprocessing import apply_bandpass_filter, zscore_normalize, aami_mapping, label_to_int
+from src.phase3_model import build_cnn_lstm_model
+from src.inference import predict_heartbeat, int_to_label
 
 def test_aami_mapping():
     """Verify that clinical labels map correctly to AAMI categories."""
@@ -27,7 +27,6 @@ def test_bandpass_filter():
     """Test the Butterworth bandpass filter output length and basic behavior."""
     fs = 360
     t = np.linspace(0, 1, fs)
-    # 2 Hz signal (should pass) + 60 Hz line noise (should be attenuated)
     clean_sig = np.sin(2 * np.pi * 2 * t)
     noise_sig = np.sin(2 * np.pi * 60 * t)
     noisy_sig = clean_sig + noise_sig
@@ -35,9 +34,6 @@ def test_bandpass_filter():
     filtered = apply_bandpass_filter(noisy_sig, fs=fs)
     
     assert len(filtered) == len(noisy_sig)
-    # Check that high frequency noise is significantly attenuated
-    # Standard deviation of high freq noise alone is approx 0.707
-    # Standard deviation of difference between filtered and clean should be small
     diff_noise = filtered - clean_sig
     assert np.std(diff_noise) < np.std(noise_sig)
 
@@ -53,7 +49,7 @@ def test_zscore_normalize():
     assert np.isclose(np.std(normalized), 1.0, atol=1e-7)
 
 def test_flatline_normalize():
-    """Test that Z-score normalization handles flatlines (all same values) gracefully."""
+    """Test that Z-score normalization handles flatlines gracefully."""
     flatline = np.ones(300) * 1.5
     normalized = zscore_normalize(flatline)
     
@@ -70,7 +66,6 @@ def test_cnn_lstm_model_compilation():
     assert model.input_shape == (None, 300, 1)
     assert model.output_shape == (None, 5)
     
-    # Check key layers exist
     layers_names = [layer.name for layer in model.layers]
     assert any("Conv1D" in name for name in layers_names)
     assert any("LSTM" in name for name in layers_names)
@@ -78,10 +73,8 @@ def test_cnn_lstm_model_compilation():
 
 def test_predict_heartbeat_mapping():
     """Test predict_heartbeat function handles mock prediction outputs properly."""
-    # Create a mock model class
     class MockModel:
         def predict(self, x, verbose=0):
-            # Output class probabilities. Let's make Ventricular (class 2) the highest.
             probs = np.zeros((1, 5))
             probs[0, 2] = 0.95
             probs[0, 0] = 0.05
