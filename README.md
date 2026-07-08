@@ -22,6 +22,8 @@ It features a **Hybrid 1D-CNN + LSTM Network** (capturing both spatial waveform 
 │   ├── phase4_training.py          # Network training engine
 │   └── phase5_evaluation.py        # holdout testing and benchmarks
 ├── visualization/                  # Academic plotting scripts
+├── docs/                           # Project documentation
+├── test_images/                    # ECG scans for validation
 ├── tests/                          # pytest automation suite
 ├── data/                           # Extracted numpy datasets [Git Ignored]
 ├── models/                         # Trained model weights (.h5) [Git Ignored]
@@ -46,6 +48,9 @@ graph LR
     C --> D[GAP & Dropout]
     D --> E[Softmax Output]
 ```
+
+### Model Architecture Layout
+![CNN-LSTM Architecture](overleaf_images/fig2_cnn_lstm_architecture.png)
 
 ---
 
@@ -74,24 +79,32 @@ Run the pipeline phases sequentially from the project root:
    ```bash
    python src/phase1_ingestion.py
    ```
+   ![Ingestion Plot](overleaf_images/phase1_plot.png)
+
 2. **Preprocess and Filter Signals:**
    ```bash
    python src/phase2_preprocessing.py
    ```
+   ![Preprocessing Pipeline](overleaf_images/fig1_preprocessing_pipeline.png)
+
 3. **Train CNN-LSTM Model:**
    ```bash
    python src/phase4_training.py
    ```
+   ![Training History](overleaf_images/phase4_history.png)
+
 4. **Evaluate holdout performance:**
    ```bash
    python src/phase5_evaluation.py
    ```
+   ![Confusion Matrix](overleaf_images/confusion_matrix.png)
 
 ### 📷 Scanning Custom ECG Images (Computer Vision):
 To classify a scanned/printed ECG image (digitizes the signal line first, then runs classification):
 ```bash
 python src/inference.py --image path/to/your/ecg_chart.png
 ```
+![Vision-based Inference Engine](overleaf_images/fig3_vision_inference.png)
 
 To test with a random numerical heartbeat from the unseen holdout set:
 ```bash
@@ -108,8 +121,10 @@ Evaluated against the reference benchmark **Yildirim (2020)** on the MIT-BIH dat
 |:---|:---:|:---:|
 | **CNN-Only** | 94.2% | 85.6% |
 | **LSTM-Only** | 91.8% | 83.2% |
-| **Yildirim (2020)** | **99.0%** | 97.1% |
+| **Yildirim (2020)** | **99.0%** | **97.1%** |
 | **Ours (Hybrid CNN-LSTM)** | **98.7%** | **97.4%** |
+
+![Performance Comparison](overleaf_images/fig5_performance_bars.png)
 
 ---
 
